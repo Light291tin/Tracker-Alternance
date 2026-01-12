@@ -1,0 +1,47 @@
+{{ form_start(form) }}
+    {# Affiche les erreurs globales s'il y en a #}
+    {{ form_errors(form) }}
+
+    {# Affiche chaque champ proprement #}
+    <div class="mb-3">
+        {{ form_row(form.company) }}
+    </div>
+    <div class="mb-3">
+        {{ form_row(form.platform) }}
+    </div>
+    <div class="mb-3">
+        {{ form_row(form.appliedAt) }}
+    </div>
+    <div class="mb-3">
+        {{ form_row(form.status) }}
+    </div>
+    
+    {# Le champ date (caché par défaut grâce au PHP qu'on vient de faire) #}
+    {{ form_row(form.interviewDate) }}
+
+    <button class="btn btn-primary">{{ button_label|default('Sauvegarder') }}</button>
+{{ form_end(form) }}
+
+{# --- LE SCRIPT JAVASCRIPT --- #}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. On récupère les éléments HTML
+        const statusSelect = document.querySelector('.status-select');
+        const interviewRow = document.querySelector('.interview-row');
+
+        // 2. La fonction qui décide d'afficher ou cacher
+        function toggleInterviewDate() {
+            if (statusSelect.value === 'Entretien') {
+                interviewRow.style.display = 'block'; // Affiche
+            } else {
+                interviewRow.style.display = 'none';  // Cache
+            }
+        }
+
+        // 3. On écoute le changement de valeur
+        statusSelect.addEventListener('change', toggleInterviewDate);
+
+        // 4. On lance la vérification au chargement de la page (pour le mode modification)
+        toggleInterviewDate();
+    });
+</script>

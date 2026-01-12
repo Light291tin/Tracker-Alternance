@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter une piste{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background: url('https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?q=80&w=2076&auto=format&fit=crop') no-repeat center center fixed; 
+        background-size: cover; font-family: 'Segoe UI', sans-serif; color: white; min-height: 100vh; margin: 0;
+        display: flex; justify-content: center; align-items: center;
+    }
+    .form-card {
+        background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px);
+        padding: 40px; border-radius: 15px; width: 100%; max-width: 500px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+    }
+    h1 { text-align: center; margin-bottom: 30px; font-size: 2rem; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 500; opacity: 0.9; }
+    input, select {
+        width: 100%; padding: 12px; border-radius: 8px; border: none;
+        background: rgba(255,255,255,0.9); color: #333; font-size: 1rem;
+    }
+    .btn-save {
+        background: #e65100; color: white; border: none; width: 100%;
+        padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
+        font-size: 1.1rem; margin-top: 20px; transition: 0.3s;
+    }
+    .btn-save:hover { background: #bf360c; transform: translateY(-2px); }
+    .link-back { display: block; text-align: center; margin-top: 20px; color: #ccc; text-decoration: none; }
+</style>
+
+<div class="form-card">
+    <h1>🚀 Ajouter une piste</h1>
+
+    {{ form_start(form) }}
+        <div class="form-group">
+            <label>Nom de l'entreprise</label>
+            {{ form_widget(form.company) }}
+        </div>
+
+        <div class="form-group">
+            <label>Site / Plateforme</label>
+            {# On utilise platform car c'est le nom dans ton ApplicationType #}
+            {{ form_widget(form.platform) }}
+        </div>
+
+        {# --- AJOUT DU CHAMP LIEN ICI --- #}
+        <div class="form-group">
+            <label>Lien de l'offre (Optionnel)</label>
+            {{ form_widget(form.link) }}
+        </div>
+        {# ------------------------------ #}
+
+        <div class="form-group">
+            <label>Date de candidature</label>
+            {{ form_widget(form.appliedAt) }}
+        </div>
+
+        <div class="form-group">
+            <label>Statut actuel</label>
+            {{ form_widget(form.status) }}
+        </div>
+
+        <button class="btn-save">Enregistrer</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('app_home') }}" class="link-back">Annuler</a>
+</div>
+{% endblock %}

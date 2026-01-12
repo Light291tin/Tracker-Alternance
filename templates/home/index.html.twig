@@ -1,0 +1,175 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Dashboard{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background: url('https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?q=80&w=2076&auto=format&fit=crop') no-repeat center center fixed; 
+        background-size: cover; font-family: 'Segoe UI', sans-serif; color: white; min-height: 100vh; margin: 0;
+    }
+    .glass-nav { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .logo { font-size: 1.5rem; font-weight: bold; color: #fff; }
+    .user-info { display: flex; align-items: center; gap: 20px; }
+    .btn-logout { color: #ff8a80; text-decoration: none; font-weight: 500; border: 1px solid #ff8a80; padding: 5px 15px; border-radius: 20px; transition: 0.3s; }
+    .btn-logout:hover { background: #ff8a80; color: white; }
+    .dashboard-container { max-width: 1200px; margin: 50px auto; padding: 0 20px; }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .btn-add { background: #e65100; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 15px rgba(230, 81, 0, 0.4); transition: 0.3s; }
+    .btn-add:hover { background: #bf360c; transform: translateY(-2px); }
+    .glass-table-container { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: rgba(0,0,0,0.3); }
+    th { text-align: left; padding: 20px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+    td { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: rgba(255,255,255,0.05); }
+    .company-name { font-weight: bold; font-size: 1.1rem; }
+    .status-select { background: rgba(0, 0, 0, 0.3); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; outline: none; }
+    .status-select option { background: #333; color: white; }
+    .date-rdv { color: #ffeb3b; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+
+    .btn-edit-table {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.1);
+        color: #90caf9;
+        padding: 6px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        border: 1px solid rgba(144, 202, 249, 0.3);
+        transition: 0.3s;
+    }
+    .btn-edit-table:hover {
+        background: #90caf9;
+        color: #111;
+        transform: translateY(-1px);
+    }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-box { background: #222; border: 1px solid #444; padding: 30px; border-radius: 15px; text-align: center; width: 90%; max-width: 400px; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .modal-box input[type="datetime-local"] { width: 100%; padding: 10px; margin: 20px 0; border-radius: 5px; border: none; font-size: 1.1rem; }
+    .btn-confirm { background: #4caf50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    .btn-close { background: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px; }
+</style>
+
+<nav class="glass-nav">
+    <div class="logo">🏔️ Tracker Alternance</div>
+    <div class="user-info">
+        {% if app.user %}
+            <span>Bonjour, {{ app.user.email }}</span>
+            <a href="{{ path('app_logout') }}" class="btn-logout">Déconnexion</a>
+        {% endif %}
+    </div>
+</nav>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Mes Candidatures</h1>
+        <a href="{{ path('app_application_new') }}" class="btn-add">+ Nouvelle Candidature</a>
+    </div>
+
+    <div class="glass-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Entreprise</th>
+                    <th>Site / Plateforme</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Rendez-vous 🕒</th>
+                    <th>Offre</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for candidature in candidatures %}
+                    <tr>
+                        <td><div class="company-name">{{ candidature.company }}</div></td>
+                        <td>{{ candidature.platform }}</td>
+                        <td>{{ candidature.appliedAt ? candidature.appliedAt|date('d/m/Y') : '-' }}</td>
+                        
+                        <td>
+                            {# CORRECTION DE LA ROUTE : app_application_update_status au lieu de app_candidature #}
+                            <form action="{{ path('app_application_update_status', {'id': candidature.id}) }}" method="post" id="form-{{ candidature.id }}">
+                                <select name="status" class="status-select" onchange="checkStatus(this, '{{ candidature.id }}')">
+                                    <option value="En attente" {{ candidature.status == 'En attente' ? 'selected' }}>En attente</option>
+                                    <option value="Entretien" {{ candidature.status == 'Entretien' ? 'selected' }}>Entretien 🤝</option>
+                                    <option value="Refusé" {{ candidature.status == 'Refusé' ? 'selected' }}>Refusé ❌</option>
+                                    <option value="Accepté" {{ candidature.status == 'Accepté' ? 'selected' }}>Accepté 🎉</option>
+                                </select>
+                                <input type="hidden" name="_token" value="{{ csrf_token('update_status' ~ candidature.id) }}">
+                                <input type="hidden" name="interviewDate" id="input-date-{{ candidature.id }}">
+                            </form>
+                        </td>
+
+                        <td>
+                            {% if candidature.interviewDate %}
+                                <div class="date-rdv">📅 {{ candidature.interviewDate|date('d/m à H:i') }}</div>
+                            {% else %}
+                                <span style="opacity: 0.3;">-</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if candidature.link %}
+                                <a href="{{ candidature.link }}" target="_blank" title="Voir l'annonce" style="color: #00e676; text-decoration: none; font-size: 1.2rem;">🔗</a>
+                            {% else %}
+                                <span style="opacity: 0.3;">-</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a href="{{ path('app_application_edit', {id: candidature.id}) }}" class="btn-edit-table">✏️ Modifier</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="7" style="text-align: center; padding: 50px;"><p>Aucune candidature. Lancez-vous ! 🚀</p></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="interviewModal" class="modal-overlay">
+    <div class="modal-box">
+        <h2>🎉 Super ! Un entretien ?</h2>
+        <p>Quand est-ce que ça se passe ?</p>
+        <input type="datetime-local" id="modalDateInput">
+        <div>
+            <button class="btn-confirm" onclick="confirmDate()">Valider</button>
+            <button class="btn-close" onclick="closeModal()">Annuler</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentFormId = null;
+    let currentInputDateId = null;
+
+    function checkStatus(selectElement, id) {
+        if (selectElement.value.includes('Entretien')) {
+            currentFormId = 'form-' + id;
+            currentInputDateId = 'input-date-' + id;
+            document.getElementById('interviewModal').style.display = 'flex';
+        } else {
+            document.getElementById('form-' + id).submit();
+        }
+    }
+
+    function confirmDate() {
+        const dateValue = document.getElementById('modalDateInput').value;
+        if (dateValue) {
+            document.getElementById(currentInputDateId).value = dateValue;
+            document.getElementById(currentFormId).submit();
+        } else {
+            alert("Merci de choisir une date !");
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('interviewModal').style.display = 'none';
+        location.reload(); 
+    }
+</script>
+{% endblock %}

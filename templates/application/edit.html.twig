@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier la candidature{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background: url('https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?q=80&w=2076&auto=format&fit=crop') no-repeat center center fixed; 
+        background-size: cover; font-family: 'Segoe UI', sans-serif; color: white; min-height: 100vh; margin: 0;
+        display: flex; justify-content: center; align-items: center;
+    }
+    .form-card {
+        background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px);
+        padding: 40px; border-radius: 15px; width: 100%; max-width: 500px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+    }
+    h1 { text-align: center; margin-bottom: 30px; font-size: 2rem; color: #fff; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 500; opacity: 0.9; color: #eee; }
+    input, select {
+        width: 100%; padding: 12px; border-radius: 8px; border: none;
+        background: rgba(255,255,255,0.9); color: #333; font-size: 1rem;
+    }
+    .btn-update {
+        background: #2e7d32; color: white; border: none; width: 100%;
+        padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
+        font-size: 1.1rem; margin-top: 10px; transition: 0.3s;
+    }
+    .btn-update:hover { background: #1b5e20; transform: translateY(-2px); }
+    
+    .delete-container { margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+    .btn-delete {
+        background: #c62828; color: white; border: none; width: 100%;
+        padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;
+        font-size: 0.9rem; transition: 0.3s; opacity: 0.8;
+    }
+    .btn-delete:hover { background: #b71c1c; opacity: 1; }
+    
+    .link-back { display: block; text-align: center; margin-top: 20px; color: #ccc; text-decoration: none; font-size: 0.9rem; }
+    .link-back:hover { color: #fff; }
+</style>
+
+<div class="form-card">
+    <h1>✏️ Modifier la piste</h1>
+
+    {{ form_start(form) }}
+        <div class="form-group">
+            <label>Nom de l'entreprise</label>
+            {{ form_widget(form.company) }}
+        </div>
+
+        <div class="form-group">
+            <label>Site / Plateforme</label>
+            {{ form_widget(form.platform) }}
+        </div>
+
+        <div class="form-group">
+            <label>Lien de l'offre (Optionnel)</label>
+            {{ form_widget(form.link) }}
+        </div>
+
+        <div class="form-group">
+            <label>Date de candidature</label>
+            {{ form_widget(form.appliedAt) }}
+        </div>
+
+        <div class="form-group">
+            <label>Statut actuel</label>
+            {{ form_widget(form.status) }}
+        </div>
+
+        <button class="btn-update">Mettre à jour</button>
+    {{ form_end(form) }}
+
+    <div class="delete-container">
+        {# On inclut le formulaire de suppression par défaut de Symfony #}
+        {{ include('application/_delete_form.html.twig') }}
+    </div>
+
+    <a href="{{ path('app_home') }}" class="link-back">← Retour au dashboard</a>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block body %}
+<style>
+    nav.navbar { display: none !important; }
+
+    /* Image Forêt sombre/brumeuse */
+    body {
+        background: url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2071&auto=format&fit=crop') no-repeat center center fixed; 
+        background-size: cover;
+        font-family: 'Segoe UI', sans-serif;
+        color: white;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+    }
+    .overlay {
+        background: rgba(0, 0, 0, 0.6);
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
+    }
+    .content-wrapper { position: relative; z-index: 2; display: flex; height: 100vh; width: 100%; align-items: center; justify-content: center; }
+    .container-split { width: 80%; max-width: 1200px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+
+    .left-side { flex: 1; padding-right: 50px; }
+    .left-side h1 { font-size: 4rem; font-weight: 800; margin-bottom: 20px; line-height: 1.1; }
+    .left-side p { font-size: 1.1rem; opacity: 0.8; max-width: 500px; }
+
+    .right-side {
+        flex: 0 0 400px; padding: 40px;
+        background: rgba(255, 255, 255, 0.1); 
+        backdrop-filter: blur(5px); border-radius: 15px; border: 1px solid rgba(255,255,255,0.2);
+    }
+    .right-side h2 { font-size: 2rem; margin-bottom: 30px; }
+    
+    .custom-label { display: block; margin-bottom: 8px; margin-top: 15px; font-size: 0.9rem; }
+    .custom-input { width: 100%; padding: 15px; border: none; border-radius: 5px; font-size: 1rem; color: #333; background: #fff; }
+    .custom-input:focus { outline: 3px solid #4caf50; }
+
+    .btn-green {
+        width: 100%; padding: 15px; margin-top: 25px;
+        background-color: #43a047;
+        color: white; font-weight: bold; border: none; border-radius: 5px; font-size: 1.1rem; cursor: pointer; transition: 0.3s;
+    }
+    .btn-green:hover { background-color: #2e7d32; }
+
+    .links a { color: #a5d6a7; text-decoration: none; }
+    
+    /* Pour afficher les erreurs en rouge sous les champs */
+    .form-error { color: #ff8a80; font-size: 0.9rem; margin-top: 5px; }
+</style>
+
+<div class="overlay"></div>
+
+<div class="content-wrapper">
+    <div class="container-split">
+        <div class="left-side">
+            <h1>Join<br>Us</h1>
+            <p>
+                Commencez votre aventure professionnelle. 
+                Créez un compte gratuit pour suivre vos progrès vers le job de vos rêves.
+            </p>
+        </div>
+
+        <div class="right-side">
+            <h2>Register</h2>
+
+            {{ form_start(registrationForm) }}
+                
+                {# Affiche les erreurs globales (ex: Token invalide) #}
+                {% if not registrationForm.vars.valid %}
+                    <div class="alert alert-danger" style="background: rgba(220,53,69,0.8); color: white; padding: 10px; border-radius: 5px;">
+                        Vérifiez vos informations ci-dessous.
+                    </div>
+                {% endif %}
+
+                <label class="custom-label">Adresse Email</label>
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'custom-input'}}) }}
+                <div class="form-error">{{ form_errors(registrationForm.email) }}</div>
+
+                <label class="custom-label">Mot de passe</label>
+                {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'custom-input', 'placeholder': '******'}}) }}
+                
+                <label class="custom-label">Confirmer le mot de passe</label>
+                {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'custom-input', 'placeholder': 'Répétez le mot de passe'}}) }}
+                
+                {# Affiche l'erreur si les mots de passe ne sont pas identiques #}
+                <div class="form-error">{{ form_errors(registrationForm.plainPassword.first) }}</div>
+
+                <button class="btn-green" type="submit">Sign up now</button>
+
+                <div class="links" style="margin-top: 20px;">
+                    Déjà un compte ? <a href="{{ path('app_login') }}">Se connecter</a>
+                </div>
+            {{ form_end(registrationForm) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

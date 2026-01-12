@@ -1,0 +1,30 @@
+services:
+  php:
+    build: .
+    restart: always
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "8000:80"
+    environment:
+      DATABASE_URL: "mysql://root:root@database:3306/tracker_alternance?serverVersion=8.0"
+  database:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tracker_alternance
+    ports:
+      - "3307:3306"
+    volumes:
+      - database_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+
+  mailer:
+    image: axllent/mailpit
+    ports:
+      - "1025"
+      - "8025"
+
+volumes:
+  database_data:

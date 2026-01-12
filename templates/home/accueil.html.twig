@@ -1,0 +1,127 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tracker Alternance - Maîtrisez votre avenir{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+        background-size: cover;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        margin: 0;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .landing-wrapper {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(to right, rgba(0, 0, 0, 0.7) 30%, rgba(0, 0, 0, 0.2) 100%);
+        padding: 0 10%;
+    }
+
+    .content-left {
+        flex: 1;
+        color: white;
+        padding-right: 50px;
+    }
+
+    .content-left h1 {
+        font-size: 4rem;
+        font-weight: 800;
+        margin-bottom: 20px;
+        line-height: 1.1;
+    }
+
+    .content-left h1 span {
+        color: #e65100; /* Ton orange de marque */
+    }
+
+    .content-left p {
+        font-size: 1.3rem;
+        opacity: 0.9;
+        max-width: 500px;
+        line-height: 1.6;
+    }
+
+    /* Carte Style Verre Dépoli (Glassmorphism) */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 60px 40px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        
+        /* CORRECTION : Centrage vertical et horizontal de tout le contenu interne */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .btn-choice {
+        display: block;
+        width: 100%; /* Prend toute la largeur disponible après le padding */
+        box-sizing: border-box; /* Empêche le décalage vers la droite dû au padding interne */
+        padding: 18px;
+        margin: 10px 0; /* Marges réduites pour un meilleur équilibre */
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    /* Bouton Connexion (Blanc/Pro) */
+    .btn-login { 
+        background: white; 
+        color: #1a1a1a; 
+    }
+    .btn-login:hover { 
+        background: #f0f0f0; 
+        transform: translateY(-3px);
+        box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Bouton Inscription (Orange de marque) */
+    .btn-register { 
+        background: #e65100; 
+        color: white; 
+    }
+    .btn-register:hover { 
+        background: #bf360c; 
+        transform: translateY(-3px);
+        box-shadow: 0 10px 15px rgba(230, 81, 0, 0.3);
+    }
+
+    .footer-text {
+        margin-top: 30px;
+        font-size: 0.85rem;
+        opacity: 0.6;
+    }
+</style>
+
+<div class="landing-wrapper">
+    <div class="content-left">
+        <h1>Bienvenue sur<br><span>Tracker Alternance</span></h1>
+        <p>L'outil professionnel pour organiser vos candidatures et atteindre les sommets de votre carrière.</p>
+    </div>
+
+    <div class="glass-card">
+        <h2 style="font-size: 2rem; margin-bottom: 10px;">Prêt à décoller ?</h2>
+        <p style="opacity: 0.8; margin-bottom: 30px;">Gérez vos pistes en un clic.</p>
+        
+        <a href="{{ path('app_login') }}" class="btn-choice btn-login">Se connecter</a>
+        <a href="{{ path('app_register') }}" class="btn-choice btn-register">Créer un compte</a>
+
+        <p class="footer-text">Rejoignez des centaines d'étudiants déjà organisés.</p>
+    </div>
+</div>
+{% endblock %}
