@@ -13,20 +13,21 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
 # 3. Installation Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
-
-# --- FIX CRUCIAL ---
-# On définit l'environnement en PRODUCTION pour ignorer le fichier .env
 ENV APP_ENV=prod
-# -------------------
 
 WORKDIR /var/www/html
 COPY . .
 
-# 4. Installation des dépendances (sans scripts pour éviter l'erreur .env au build)
+# --- LE FIX DÉFINITIF ---
+# On crée un fichier .env factice pour empêcher Symfony de planter
+RUN echo "APP_ENV=prod" > .env
+# ------------------------
+
+# 4. Installation des dépendances
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # 5. Droits d'accès
 RUN mkdir -p var/cache var/log && chown -R www-data:www-data var
 
-# 6. Commande de démarrage simplifiée
+# 6. Démarrage (Migrations + Apache)
 CMD php bin/console doctrine:migrations:migrate --no-interaction && apache2-foreground
