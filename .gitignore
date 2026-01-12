@@ -1,3 +1,5 @@
+# Empêcher l'envoi du fichier de configuration principal (SÉCURITÉ)
+/.env
 
 ###> symfony/framework-bundle ###
 /.env.local
