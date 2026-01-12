@@ -1,28 +1,32 @@
 FROM php:8.2-apache
 
-# Installation des pilotes Postgres et outils
+# 1. Installation des dépendances et drivers Postgres
 RUN apt-get update && apt-get install -y \
     libicu-dev libpq-dev libzip-dev unzip git \
     && docker-php-ext-install intl pdo pdo_pgsql zip
 
-# Config Apache
+# 2. Config Apache
 RUN a2enmod rewrite
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 
-# Installation Composer
+# 3. Installation Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# --- FIX CRUCIAL ---
+# On définit l'environnement en PRODUCTION pour ignorer le fichier .env
+ENV APP_ENV=prod
+# -------------------
 
 WORKDIR /var/www/html
 COPY . .
 
-# Installation des dépendances sans scripts pour éviter le blocage build
+# 4. Installation des dépendances (sans scripts pour éviter l'erreur .env au build)
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Droits et dossier de démarrage
-RUN chown -R www-data:www-data var
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+# 5. Droits d'accès
+RUN mkdir -p var/cache var/log && chown -R www-data:www-data var
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+# 6. Commande de démarrage simplifiée
+CMD php bin/console doctrine:migrations:migrate --no-interaction && apache2-foreground
