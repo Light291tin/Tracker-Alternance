@@ -1,12 +1,12 @@
 FROM php:8.2-apache
 
-# 1. Installation des dépendances et PostgreSQL
+# 1. Installation des outils et de PostgreSQL
 RUN apt-get update && apt-get install -y \
     libicu-dev libpq-dev libzip-dev unzip git zip \
     && docker-php-ext-install intl pdo_pgsql zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 2. Configuration d'Apache pour Symfony
+# 2. Config Apache pour Symfony
 RUN a2enmod rewrite
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
@@ -18,17 +18,18 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 WORKDIR /var/www/html
 COPY . .
 
-# 4. Installation des dépendances
+# 4. Installation des dépendances (sans générer le cache tout de suite)
 RUN echo "APP_ENV=prod" > .env \
     && composer install --no-dev --optimize-autoloader --no-scripts
 
-# 5. SOLUTION AUX ERREURS DE PERMISSION
-# On dit à Symfony d'écrire son cache et ses logs dans /tmp
+# 5. CONFIGURATION DU CACHE DANS /TMP (LE FIX FINAL)
+# On crée les dossiers dans /tmp et on donne tous les droits
 RUN mkdir -p /tmp/cache /tmp/logs && chmod -R 777 /tmp/cache /tmp/logs
+# On force Symfony à utiliser ces dossiers
 ENV SYMFONY_CACHE_DIR=/tmp/cache
 ENV SYMFONY_LOG_DIR=/tmp/logs
 
-# 6. Droits sur les fichiers du projet
+# 6. Droits sur le reste du code pour Apache
 RUN chown -R www-data:www-data /var/www/html
 
 # 7. Démarrage
