@@ -27,14 +27,14 @@ WORKDIR /var/www/html
 COPY . .
 
 # 5. Création du .env et installation des dépendances
-# IMPORTANT : On installe d'abord, on change les droits APRES
 RUN echo "APP_ENV=prod" > .env \
     && composer install --no-dev --optimize-autoloader --no-scripts
 
-# 6. FIX DES PERMISSIONS (CRUCIAL)
-# On donne les droits à l'utilisateur Apache sur TOUT le projet
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/var
+# 6. FIX DES PERMISSIONS (LA VERSION STABLE)
+# On force la création du dossier var s'il n'existe pas, puis on donne les droits
+RUN mkdir -p /var/www/html/var /var/www/html/var/cache /var/www/html/var/log \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod -R 777 /var/www/html/var
 
 # 7. Commande de démarrage
 CMD (php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration || true) && apache2-foreground
