@@ -22,13 +22,13 @@ COPY . .
 RUN echo "APP_ENV=prod" > .env \
     && composer install --no-dev --optimize-autoloader --no-scripts
 
-# 5. --- LA SOLUTION MIRACLE POUR RENDER ---
-# On dit à Symfony d'écrire son cache dans /tmp (toujours autorisé en écriture)
+# 5. SOLUTION AUX ERREURS DE PERMISSION
+# On dit à Symfony d'écrire son cache et ses logs dans /tmp
 RUN mkdir -p /tmp/cache /tmp/logs && chmod -R 777 /tmp/cache /tmp/logs
 ENV SYMFONY_CACHE_DIR=/tmp/cache
 ENV SYMFONY_LOG_DIR=/tmp/logs
 
-# 6. Droits sur les fichiers restants
+# 6. Droits sur les fichiers du projet
 RUN chown -R www-data:www-data /var/www/html
 
 # 7. Démarrage
