@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install intl pdo_pgsql zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 2. Configuration d'Apache pour Symfony
+# 2. Configuration d'Apache pour pointer vers /public
 RUN a2enmod rewrite
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
@@ -23,16 +23,16 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 WORKDIR /var/www/html
 
-# 4. Copie des fichiers
+# 4. Copie des fichiers du projet
 COPY . .
 
 # 5. Création du .env et installation des dépendances
 RUN echo "APP_ENV=prod" > .env \
     && composer install --no-dev --optimize-autoloader --no-scripts
 
-# 6. FIX DES PERMISSIONS (LA VERSION STABLE)
-# On force la création du dossier var s'il n'existe pas, puis on donne les droits
-RUN mkdir -p /var/www/html/var /var/www/html/var/cache /var/www/html/var/log \
+# 6. FIX DES PERMISSIONS (CORRECTIF ICI)
+# On crée le dossier var s'il n'existe pas, puis on donne les droits
+RUN mkdir -p /var/www/html/var \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 777 /var/www/html/var
 
