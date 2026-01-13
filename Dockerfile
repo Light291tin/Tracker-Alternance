@@ -1,7 +1,6 @@
 FROM php:8.2-apache
 
 # 1. Installation des dépendances système et du driver PostgreSQL
-# On installe seulement pdo_pgsql pour éviter les conflits de chargement
 RUN apt-get update && apt-get install -y \
     libicu-dev \
     libpq-dev \
@@ -12,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install intl pdo_pgsql zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 2. Configuration d'Apache pour pointer vers le dossier /public de Symfony
+# 2. Configuration d'Apache pour pointer vers /public
 RUN a2enmod rewrite
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
@@ -27,14 +26,15 @@ WORKDIR /var/www/html
 # 4. Copie des fichiers du projet
 COPY . .
 
-# 5. Création d'un fichier .env minimal pour éviter l'erreur PathException
-# Installation des dépendances Symfony sans les outils de dev
+# 5. Création du .env et installation des dépendances
 RUN echo "APP_ENV=prod" > .env \
     && composer install --no-dev --optimize-autoloader --no-scripts
 
-# 6. Droits d'accès pour les dossiers de cache et logs
-RUN mkdir -p var/cache var/log && chown -R www-data:www-data var
+# 6. FIX DES PERMISSIONS (LA CORRECTION)
+# On crée les dossiers et on donne les droits 777 pour éviter l'erreur de renommage
+RUN mkdir -p var/cache var/log \
+    && chown -R www-data:www-data var \
+    && chmod -R 777 var
 
 # 7. Commande de démarrage
-# On tente les migrations, mais on lance Apache même si elles échouent pour ne pas bloquer le port
 CMD (php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration || true) && apache2-foreground
