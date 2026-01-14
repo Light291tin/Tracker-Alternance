@@ -11,13 +11,12 @@ class Kernel extends BaseKernel
 
     // Force le cache dans /tmp pour éviter les erreurs de permission sur Render
     public function getCacheDir(): string
-    {
-        return '/tmp/cache/'.$this->environment;
-    }
+{
+    return '/tmp/cache/'.$this->environment;
+}
 
-    // Force les logs dans /tmp
-    public function getLogDir(): string
-    {
-        return '/tmp/logs';
-    }
+public function getLogDir(): string
+{
+    return '/tmp/logs';
+}
 }
